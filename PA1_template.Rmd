@@ -42,7 +42,7 @@ steps_total
 
 2. Histogram of the total number of steps taken per day
 ```{r}
-hist(steps_total$total, xlab = "Steps per day", main = "Histogram of total number steps taken per day", col = "dark green")
+hist(steps_total$total, xlab = "Steps per day", main = "Histogram of total number steps taken per day", col = "dark green", breaks = 20)
 ```
 
 
@@ -122,7 +122,7 @@ for (i in 1:nrow(new_data)) {
 4. Obtaining a histogram with the new dataset
 ```{r}
 totals <- new_data %>% group_by(date) %>% summarise(total = sum(steps))
-with(totals, hist(total, xlab = "Steps per day", main = "Total number steps taken per day", col = "blue"))
+with(totals, hist(total, xlab = "Steps per day", main = "Total number steps taken per day", col = "blue", breaks = 20))
 
 agg2 <- (new_data %>% group_by(date) 
     %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
