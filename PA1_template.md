@@ -92,14 +92,15 @@ steps_total
 hist(steps_total$total, xlab = "Steps per day", main = "Histogram of total number steps taken per day", col = "dark green", breaks = 20)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 
 3. Obtaining the mean and the median number of steps by day
 
 ```r
-agg <- (data2 %>% group_by(date) 
-    %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
+agg <- (data2 %>% group_by(date)
+    %>% summarise(s_steps = sum(steps))
+    %>% summarise(mean_steps = mean(s_steps), median_steps = median(s_steps))
     %>% print)
 ```
 
@@ -108,20 +109,10 @@ agg <- (data2 %>% group_by(date)
 ```
 
 ```
-## # A tibble: 53 x 3
-##    date       mean_steps median_steps
-##    <date>          <dbl>        <dbl>
-##  1 2012-10-02      0.438            0
-##  2 2012-10-03     39.4              0
-##  3 2012-10-04     42.1              0
-##  4 2012-10-05     46.2              0
-##  5 2012-10-06     53.5              0
-##  6 2012-10-07     38.2              0
-##  7 2012-10-09     44.5              0
-##  8 2012-10-10     34.4              0
-##  9 2012-10-11     35.8              0
-## 10 2012-10-12     60.4              0
-## # ... with 43 more rows
+## # A tibble: 1 x 2
+##   mean_steps median_steps
+##        <dbl>        <int>
+## 1     10766.        10765
 ```
 
 
@@ -135,13 +126,6 @@ First, the data needs to be aggregated by the mean for each interval
 
 ```r
 library(ggplot2)
-```
-
-```
-## Need help? Try Stackoverflow: https://stackoverflow.com/tags/ggplot2
-```
-
-```r
 data_plot <- (data2 %>% group_by(interval) 
     %>% summarise(mean_steps = mean(steps)) 
     %>% print)
@@ -174,7 +158,7 @@ g <- ggplot(data_plot, aes(x = interval, y = mean_steps))
 g + geom_line(color = "blue", size = 1) + labs(title = "Average daily activity pattern by intervals", x = "Interval", y = "Average steps")
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 2. Getting the interval with max number of steps
@@ -263,11 +247,13 @@ totals <- new_data %>% group_by(date) %>% summarise(total = sum(steps))
 with(totals, hist(total, xlab = "Steps per day", main = "Total number steps taken per day", col = "blue", breaks = 20))
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ```r
-agg2 <- (new_data %>% group_by(date) 
-    %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
+# Getting the mean and the median
+agg2 <- (new_data %>% group_by(date)
+    %>% summarise(s_steps2 = sum(steps))
+    %>% summarise(mean_steps = mean(s_steps2), median_steps = median(s_steps2))
     %>% print)
 ```
 
@@ -276,20 +262,10 @@ agg2 <- (new_data %>% group_by(date)
 ```
 
 ```
-## # A tibble: 61 x 3
-##    date       mean_steps median_steps
-##    <date>          <dbl>        <dbl>
-##  1 2012-10-01     37.4           34.1
-##  2 2012-10-02      0.438          0  
-##  3 2012-10-03     39.4            0  
-##  4 2012-10-04     42.1            0  
-##  5 2012-10-05     46.2            0  
-##  6 2012-10-06     53.5            0  
-##  7 2012-10-07     38.2            0  
-##  8 2012-10-08     37.4           34.1
-##  9 2012-10-09     44.5            0  
-## 10 2012-10-10     34.4            0  
-## # ... with 51 more rows
+## # A tibble: 1 x 2
+##   mean_steps median_steps
+##        <dbl>        <dbl>
+## 1     10766.       10766.
 ```
 
 
@@ -369,4 +345,4 @@ g2 <- ggplot(data_plot2, aes(x = interval, y = mean_steps))
 g2 + geom_line(color = "red") + facet_wrap(. ~ weekdays, nrow = 2) + labs(title = "Daily activity pattern by intervals", x = "Interval", y = "Average steps")
 ```
 
-![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
