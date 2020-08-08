@@ -247,6 +247,7 @@ agg2 <- (new_data %>% group_by(date)
 ##        <dbl>        <dbl>
 ## 1     10766.       10766.
 ```
+The mean and median are still very similar
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
