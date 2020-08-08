@@ -1,25 +1,155 @@
+  
 ---
 title: "Reproducible Research: Peer Assessment 1"
 output: 
   html_document:
     keep_md: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 
 ## Loading and preprocessing the data
 
+1. Reading the data
+```{r}
+data <- read.csv("activity.csv")
+```
+
+2. Transform the variable date with date format
+```{r}
+data$date <- as.Date(data$date, "%Y-%m-%d")
+```
 
 
-## What is mean total number of steps taken per day?
+## Total number of steps taken per day
+```{r}
+# Filter NAs
+library(dplyr)
+good <- !(is.na(data$steps))
+data2 <- data[good,]
+```
+
+1. Total number of steps taken per day
+```{r}
+steps_total <- data2 %>% group_by(date) %>% summarise(total = sum(steps))
+steps_total
+```
 
 
+2. Histogram of the total number of steps taken per day
+```{r}
+hist(steps_total$total, xlab = "Steps per day", main = "Histogram of total number steps taken per day", col = "dark green")
+```
 
-## What is the average daily activity pattern?
 
+3. Obtaining the mean and the median number of steps by day
+```{r}
+agg <- (data2 %>% group_by(date) 
+    %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
+    %>% print)
+```
+
+
+## Daily activity pattern
+
+
+1. Creating a series plot
+
+
+First, the data needs to be aggregated by the mean for each interval
+```{r}
+library(ggplot2)
+data_plot <- (data2 %>% group_by(interval) 
+    %>% summarise(mean_steps = mean(steps)) 
+    %>% print)
+
+# Creating the plot
+g <- ggplot(data_plot, aes(x = interval, y = mean_steps))
+g + geom_line(color = "blue", size = 1) + labs(title = "Average daily activity pattern by intervals", x = "Interval", y = "Average steps")
+```
+
+
+2. Getting the interval with max number of steps
+```{r}
+n <- (data2 %>% group_by(interval) 
+    %>% summarise(mean_steps = mean(steps))
+    %>% summarise(max_n = which.max(mean_steps))
+    %>% print)
+max_num <- data2$interval[n$max_n]
+```
+
+
+On average across all the days in the dataset, the 5 minute interval that contains the maximum number of steps is `r max_num`
 
 
 ## Imputing missing values
 
 
+1. Getting total missing values
+```{r}
+missing <- sum(is.na(data))
+missing
+```
+The total number of missing values in the dataset is `r missing`
+
+
+2. Using the steps mean by interval to fill the observations with missing values
+```{r}
+length(which(data$interval == 0)) # There are 61 repeated intervals
+```
+
+
+3. Creating a new dataset with the missing data filled in
+```{r}
+# New dataset
+new_data <- data
+# Using the previous data to obtain the mean steps by interval
+new_data$mean_steps <- rep(data_plot$mean_steps, 61)
+
+# loop to fill missing values
+for (i in 1:nrow(new_data)) {
+    if (is.na(new_data$steps[i])){
+        new_data$steps[i] <- new_data$mean_steps[i]
+    } else{next}
+}
+```
+
+
+4. Obtaining a histogram with the new dataset
+```{r}
+totals <- new_data %>% group_by(date) %>% summarise(total = sum(steps))
+with(totals, hist(total, xlab = "Steps per day", main = "Total number steps taken per day", col = "blue"))
+
+agg2 <- (new_data %>% group_by(date) 
+    %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
+    %>% print)
+```
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+1. Creating a new factor variable with two levels: "weekday" and "weekend"
+```{r}
+library(lubridate)
+week1 = weekdays(data$date)
+
+# Transforming the variable weekdays into two levels
+week1[week1 %in% c("lunes","martes","miércoles","jueves","viernes")] <- "weekday"
+week1[week1 %in% c("sábado","domingo")] <- "weekend"
+
+new_data$weekdays <- factor(week1)
+str(new_data)
+```
+
+
+2. Creating a series plot by each level
+```{r}
+data_plot2 <- (new_data %>% group_by(weekdays,interval) 
+    %>% summarise(mean_steps = mean(steps)) 
+    %>% print)
+
+g2 <- ggplot(data_plot2, aes(x = interval, y = mean_steps))
+g2 + geom_line(color = "red") + facet_wrap(. ~ weekdays, nrow = 2) + labs(title = "Daily activity pattern by intervals", x = "Interval", y = "Average steps")
+```
