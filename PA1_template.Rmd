@@ -48,8 +48,9 @@ hist(steps_total$total, xlab = "Steps per day", main = "Histogram of total numbe
 
 3. Obtaining the mean and the median number of steps by day
 ```{r}
-agg <- (data2 %>% group_by(date) 
-    %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
+agg <- (data2 %>% group_by(date)
+    %>% summarise(s_steps = sum(steps))
+    %>% summarise(mean_steps = mean(s_steps), median_steps = median(s_steps))
     %>% print)
 ```
 
@@ -124,11 +125,13 @@ for (i in 1:nrow(new_data)) {
 totals <- new_data %>% group_by(date) %>% summarise(total = sum(steps))
 with(totals, hist(total, xlab = "Steps per day", main = "Total number steps taken per day", col = "blue", breaks = 20))
 
-agg2 <- (new_data %>% group_by(date) 
-    %>% summarise(mean_steps = mean(steps), median_steps = median(steps)) 
+# Getting the mean and the median
+agg2 <- (new_data %>% group_by(date)
+    %>% summarise(s_steps2 = sum(steps))
+    %>% summarise(mean_steps = mean(s_steps2), median_steps = median(s_steps2))
     %>% print)
 ```
-
+The mean and the median are still very similar
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
